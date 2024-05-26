@@ -57,10 +57,10 @@ export default function App() {
   }
 
   return (
-    <>
-      <h1>DivvyUp!</h1>
-      <div className="app">
-        <div className="sidebar">
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 text-gray-800">
+      <h1 className="text-4xl font-bold mb-6">DivvyUp!</h1>
+      <div className="flex flex-row space-x-6">
+        <div className="w-96 p-4 bg-white shadow rounded-lg">
           <FriendsList
             friends={friends}
             onFriendSelection={handleSelectFriend}
@@ -72,13 +72,13 @@ export default function App() {
           </Button>
         </div>
         {selectedFriend && (
-          <FormSpliBill
+          <FormSplitBill
             selectedFriend={selectedFriend}
-            onSpliBill={handleSplitBill}
+            onSplitBill={handleSplitBill}
           />
         )}
       </div>
-    </>
+    </div>
   );
 }
 
@@ -98,25 +98,32 @@ function FriendsList({ friends, onFriendSelection, selectedFriend }) {
 }
 
 function Friend({ friend, onSelection, selectedFriend }) {
-  // receieve friend obj as prop from parent component - friends list
   const isSelected = selectedFriend?.id === friend.id;
   return (
-    <li className={isSelected ? "selected" : ""}>
-      <img src={friend.image} alt={friend.name} />
-      <h3>{friend.name}</h3>
-      {/* one paragraph only based on condition */}
-      {friend.balance < 0 && (
-        <p className="red">
-          You owe {friend.name} R{Math.abs(friend.balance)}
-        </p>
-      )}
-      {friend.balance > 0 && (
-        <p className="green">
-          {friend.name} owes you R{friend.balance}
-        </p>
-      )}
-      {friend.balance === 0 && <p>You and {friend.name} are even</p>}
-      {/* only one p  */}
+    <li
+      className={`flex items-center space-x-4 p-4 rounded-lg transition duration-300 ${
+        isSelected ? "bg-gray-200" : "hover:bg-gray-100"
+      }`}
+    >
+      <img
+        src={friend.image}
+        alt={friend.name}
+        className="w-12 h-12 rounded-full"
+      />
+      <div className="flex-1">
+        <h3 className="text-lg font-semibold">{friend.name}</h3>
+        {friend.balance < 0 && (
+          <p className="text-red-500">
+            You owe {friend.name} R{Math.abs(friend.balance)}
+          </p>
+        )}
+        {friend.balance > 0 && (
+          <p className="text-green-500">
+            {friend.name} owes you R{friend.balance}
+          </p>
+        )}
+        {friend.balance === 0 && <p>You and {friend.name} are even</p>}
+      </div>
       <Button onClick={() => onSelection(friend)}>
         {isSelected ? "Close" : "Select"}
       </Button>
@@ -125,11 +132,16 @@ function Friend({ friend, onSelection, selectedFriend }) {
 }
 
 function Button({ children, onClick, disabled }) {
-  /* When onClick is not provided, it defaults to undefined. 
-  The button element in HTML supports having onClick as undefined, 
-  which means nothing will happen when the button is clicked. */
   return (
-    <button className="button" onClick={onClick} disabled={disabled}>
+    <button
+      className={`px-4 py-2 mt-2 rounded-lg font-semibold transition duration-300 ${
+        disabled
+          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+          : "bg-orange-500 text-white hover:bg-orange-600"
+      }`}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {children}
     </button>
   );
@@ -158,27 +170,32 @@ function FormAddFriend({ onAddFriend }) {
   }
 
   return (
-    <form className="form-add-friend" onSubmit={handleSubmit}>
-      <label>👬 Friend:</label>
+    <form
+      className="grid gap-4 bg-gray-50 p-4 rounded-lg shadow"
+      onSubmit={handleSubmit}
+    >
+      <label className="font-medium">👬 Friend:</label>
       <input
         type="text"
         placeholder="Friend Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
+        className="p-2 border border-gray-300 rounded"
       />
-      <label>🖼️ Image URL:</label>
+      <label className="font-medium">🖼️ Image URL:</label>
       <input
         type="text"
         placeholder="Image URL"
         value={image}
         onChange={(e) => setImage(e.target.value)}
+        className="p-2 border border-gray-300 rounded"
       ></input>
       <Button disabled={!name || !image}>Add</Button>
     </form>
   );
 }
 
-function FormSpliBill({ selectedFriend, onSpliBill }) {
+function FormSplitBill({ selectedFriend, onSplitBill }) {
   const [bill, setBill] = useState("");
   const [myExpense, setMyExpense] = useState("");
   const [whoIsPaying, setWhoIsPaying] = useState("user");
@@ -188,20 +205,26 @@ function FormSpliBill({ selectedFriend, onSpliBill }) {
     e.preventDefault();
     if (!bill || !myExpense) return;
 
-    onSpliBill(whoIsPaying === "user" ? friendExpense : -myExpense);
+    onSplitBill(whoIsPaying === "user" ? friendExpense : -myExpense);
   }
 
   return (
-    <form className="form-split-bill" onSubmit={handleSubmit}>
-      <h2>Split a bill with {selectedFriend.name}</h2>
-      <label>💳 Bill Value:</label>
+    <form
+      className="grid gap-4 bg-gray-50 p-6 rounded-lg shadow"
+      onSubmit={handleSubmit}
+    >
+      <h2 className="text-2xl font-semibold">
+        Split a bill with {selectedFriend.name}
+      </h2>
+      <label className="font-medium">💳 Bill Value:</label>
       <input
         type="text"
         placeholder="R Value"
         value={bill}
         onChange={(e) => setBill(Number(e.target.value))}
+        className="p-2 border border-gray-300 rounded"
       ></input>
-      <label>🙋‍♂️ Your expense:</label>
+      <label className="font-medium">🙋‍♂️ Your expense:</label>
       <input
         type="text"
         placeholder="R Value"
@@ -211,18 +234,23 @@ function FormSpliBill({ selectedFriend, onSpliBill }) {
             Number(e.target.value) > bill ? myExpense : Number(e.target.value)
           )
         }
+        className="p-2 border border-gray-300 rounded"
       ></input>
-      <label>👬 {selectedFriend.name}'s Expenses:</label>
+      <label className="font-medium">
+        👬 {selectedFriend.name}'s Expenses:
+      </label>
       <input
         type="text"
         placeholder="R Value"
         disabled
         value={friendExpense}
+        className="p-2 border border-gray-300 rounded bg-gray-200"
       ></input>
-      <label>💰 Who is paying?</label>
+      <label className="font-medium">💰 Who is paying?</label>
       <select
         value={whoIsPaying}
         onChange={(e) => setWhoIsPaying(e.target.value)}
+        className="p-2 border border-gray-300 rounded"
       >
         <option value="user">You</option>
         <option value="friend">{selectedFriend.name}</option>
