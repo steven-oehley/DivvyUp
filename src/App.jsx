@@ -178,7 +178,11 @@ function FormSpliBill({ selectedFriend }) {
         type="text"
         placeholder="R Value"
         value={myExpense}
-        onChange={(e) => setMyExpense(Number(e.target.value))}
+        onChange={(e) =>
+          setMyExpense(
+            Number(e.target.value) > bill ? myExpense : Number(e.target.value)
+          )
+        }
       ></input>
       <label>👬 {selectedFriend.name}'s Expenses:</label>
       <input
